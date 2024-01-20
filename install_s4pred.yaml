@@ -1,0 +1,39 @@
+- name: Setup s4pred environment
+  hosts: client:cluster
+  become: yes
+  vars:
+    virtualenv_directory: "/home/ec2-user/data/myvenv"
+    s4pred_directory: "/home/ec2-user/data/s4pred"
+    weights_url: "http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights.tar.gz"
+    weights_tarball: "weights.tar.gz"
+    weights_md5: "e04ad7d10b61551f7e07a86b65bb88dc"
+
+  tasks:
+    - name: Ensure s4pred directory exists
+      file:
+        path: "{{ s4pred_directory }}"
+        state: directory
+        mode: '0755'
+
+    - name: Clone s4pred repository
+      git:
+        repo: "https://github.com/psipred/s4pred"
+        dest: "{{ s4pred_directory }}"
+        clone: yes
+        update: yes
+
+    - name: Download the model weights tarball
+      get_url:
+        url: "{{ weights_url }}"
+        dest: "{{ s4pred_directory }}/{{ weights_tarball }}"
+        mode: '0644'
+
+    - name: Extract the model weights for s4pred
+      unarchive:
+        src: "{{ s4pred_directory }}/{{ weights_tarball }}"
+        dest: "{{ s4pred_directory }}"
+        remote_src: yes
+
+    - name: Check MD5 checksum of the downloaded weights
+      command:
+        cmd: "echo '{{ weights_md5 }} {{ s4pred_directory }}/{{ weights_tarball }}' | md5sum -c"

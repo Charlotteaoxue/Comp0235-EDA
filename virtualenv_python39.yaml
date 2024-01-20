@@ -1,0 +1,38 @@
+- name: Setup Python 3.9 virtual environment
+  hosts: client:cluster
+  become: yes
+  tasks:
+    - name: Import EPEL GPG key
+      rpm_key:
+        key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Download EPEL Release package
+      get_url:
+        url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+        dest: "/tmp/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+      when: ansible_os_family == "RedHat"
+
+    - name: Install EPEL Release package
+      yum:
+        name: "/tmp/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure the directory for the virtual environment exists
+      file:
+        path: "/home/ec2-user/data/myvenv"
+        state: directory
+        mode: '0755'
+
+    - name: Install Python 3.9
+      yum:
+        name: python39
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Create a virtual environment with Python 3.9
+      command:
+        cmd: "python3.9 -m venv /home/ec2-user/data/myvenv"
+        creates: "/home/ec2-user/data/myvenv/bin/activate"

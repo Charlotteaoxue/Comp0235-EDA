@@ -1,0 +1,28 @@
+- name: Setup Python environment on client and cluster
+  hosts: client:cluster
+  become: yes
+  vars:
+    virtualenv_directory: "/home/ec2-user/data/myvenv"
+
+  tasks:
+    - name: Upgrade pip
+      shell: "{{ virtualenv_directory }}/bin/pip install --upgrade pip"
+      args:
+        executable: /bin/bash
+
+    - name: Install PyTorch 1.8 CPU version, TorchVision and Torchaudio in the virtual environment
+      pip:
+        name: "{{ item }}"
+        virtualenv: "{{ virtualenv_directory }}"
+        extra_args: "--no-cache-dir --find-links https://download.pytorch.org/whl/torch_stable.html"
+      loop:
+        - torch==1.8.0+cpu
+        - torchvision==0.9.0
+        - torchaudio==0.8.0
+
+    - name: Install dependencies from requirements.txt
+      shell: |
+        source {{ virtualenv_directory }}/bin/activate
+        pip install -r {{ virtualenv_directory }}/requirements.txt
+      args:
+        executable: /bin/bash

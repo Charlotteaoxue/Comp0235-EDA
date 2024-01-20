@@ -1,0 +1,38 @@
+- name: Install HH-suite3 AVX2 build in the virtual environment
+  hosts: client:cluster
+  become: yes
+  vars:
+    virtualenv_directory: "/home/ec2-user/data/myvenv"
+    hhsuite_version: "3.3.0"
+    hhsuite_build: "AVX2"
+    hhsuite_install_directory: "{{ virtualenv_directory }}/hhsuite-{{ hhsuite_version }}-{{ hhsuite_build }}-Linux"
+    hhsuite_tar: "hhsuite-{{ hhsuite_version }}-{{ hhsuite_build }}-Linux.tar.gz"
+    hhsuite_tar_path: "{{ virtualenv_directory }}/{{ hhsuite_tar }}"
+    
+  tasks:
+    - name: Download HH-suite3 AVX2 build
+      get_url:
+        url: "https://github.com/soedinglab/hh-suite/releases/download/v{{ hhsuite_version }}/hhsuite-{{ hhsuite_version }}-{{ hhsuite_build }}-Linux.tar.gz"
+        dest: "{{ virtualenv_directory }}/hhsuite-{{ hhsuite_version }}-{{ hhsuite_build }}-Linux.tar.gz"
+        mode: '0644'
+
+    - name: Extract HH-suite3 AVX2 build
+      unarchive:
+        src: "{{ virtualenv_directory }}/hhsuite-{{ hhsuite_version }}-{{ hhsuite_build }}-Linux.tar.gz"
+        dest: "{{ virtualenv_directory }}"
+        remote_src: yes
+      register: hhsuite_extracted
+
+    - name: Set PATH environment variable
+      lineinfile:
+        path: "{{ virtualenv_directory }}/bin/activate"
+        line: 'export PATH="{{ hhsuite_install_directory }}/bin:{{ hhsuite_install_directory }}/scripts:$PATH"'
+        insertafter: 'export PATH='
+        state: present
+      when: hhsuite_extracted is changed
+
+    - name: Remove the downloaded HH-suite3 tar.gz file
+      file:
+        path: "{{ hhsuite_tar_path }}"
+        state: absent
+      when: hhsuite_extracted is changed
