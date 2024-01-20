@@ -1,0 +1,20 @@
+# Define the control node
+[control]
+my_control ansible_host=13.43.32.240 instance_id=i-0c351deace39cad89
+
+# Define the client node
+[client]
+my_client ansible_host=13.43.174.132 instance_id=i-076867ffcdc8392b
+
+# Define the cluster nodes
+[cluster]
+cluster1 ansible_host=13.42.235.215 instance_id=i-0788ee982b49b85fc
+cluster2 ansible_host=13.43.50.108 instance_id=i-03fd28e6fa2d29359
+cluster3 ansible_host=3.10.1.48 instance_id=i-02bbc8782a2a4a557
+cluster4 ansible_host=52.56.35.76 instance_id=i-020514559624b02d6
+
+# Define variables common to all hosts
+[all:vars]
+ansible_user=ec2-user
+ansible_ssh_private_key_file=/home/ec2-user/.ssh/ansible_key
+region=us-west-2
