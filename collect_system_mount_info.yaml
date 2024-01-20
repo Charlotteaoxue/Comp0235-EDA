@@ -1,0 +1,12 @@
+- name: Display All Disks and Partitions Information
+  hosts: all
+  become: true
+  tasks:
+    - name: Get list of all disks and partitions with their mount points
+      command: lsblk -nlo NAME,MOUNTPOINT
+      register: lsblk_output
+
+    - name: Display all disks and partitions
+      debug:
+        msg: "{{ item }}"
+      loop: "{{ lsblk_output.stdout_lines }}"
