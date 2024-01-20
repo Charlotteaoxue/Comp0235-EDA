@@ -1,0 +1,18 @@
+- hosts: control
+  tasks:
+    - name: Split experiment_ids.txt into chunks of 858 lines each
+      ansible.builtin.shell: split -l 858 -d --additional-suffix=.txt experiment_ids.txt experiment_ids_
+      args:
+        chdir: /home/ec2-user/
+      register: split_result
+
+    - name: Rename split files to follow a specific naming pattern
+      ansible.builtin.shell: |
+        a=1
+        for file in experiment_ids_*; do 
+          mv "$file" "experiment_ids_${a}.txt"
+          let a++
+        done
+      args:
+        chdir: /home/ec2-user/
+      when: split_result.rc == 0

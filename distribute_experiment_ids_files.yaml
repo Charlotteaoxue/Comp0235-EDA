@@ -1,0 +1,38 @@
+- name: Distribute experiment_ids files to client
+  hosts: client
+  tasks:
+    - name: Copy experiment_ids_1.txt, experiment_ids_2.txt, experiment_ids_3.txt to client
+      copy:
+        src: "/home/ec2-user/{{ item }}"
+        dest: "/home/ec2-user/data/pdb70/"
+      loop:
+        - "experiment_ids_1.txt"
+        - "experiment_ids_2.txt"
+        - "experiment_ids_3.txt"
+
+- name: Distribute individual experiment_ids files to each cluster
+  hosts: cluster
+  tasks:
+    - name: Copy experiment_ids_4.txt to cluster 1
+      copy:
+        src: "/home/ec2-user/experiment_ids_4.txt"
+        dest: "/home/ec2-user/data/pdb70/"
+      when: inventory_hostname == 'cluster1'
+
+    - name: Copy experiment_ids_5.txt to cluster 2
+      copy:
+        src: "/home/ec2-user/experiment_ids_5.txt"
+        dest: "/home/ec2-user/data/pdb70/"
+      when: inventory_hostname == 'cluster2'
+
+    - name: Copy experiment_ids_6.txt to cluster 3
+      copy:
+        src: "/home/ec2-user/experiment_ids_6.txt"
+        dest: "/home/ec2-user/data/pdb70/"
+      when: inventory_hostname == 'cluster3'
+
+    - name: Copy experiment_ids_7.txt to cluster 4
+      copy:
+        src: "/home/ec2-user/experiment_ids_7.txt"
+        dest: "/home/ec2-user/data/pdb70/"
+      when: inventory_hostname == 'cluster4'
