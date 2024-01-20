@@ -1,0 +1,11 @@
+- name: Copy requirements.txt to cluster nodes
+  hosts: client:cluster
+  become: yes
+  tasks:
+    - name: Transfer requirements.txt
+      copy:
+        src: /home/ec2-user/requirements.txt
+        dest: /home/ec2-user/data/myvenv/requirements.txt
+        owner: ec2-user
+        group: ec2-user
+        mode: '0644'
