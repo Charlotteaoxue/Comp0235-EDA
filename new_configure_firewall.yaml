@@ -1,0 +1,53 @@
+- name: Setup Firewalld on Client and Cluster Nodes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Firewalld
+      package:
+        name: firewalld
+        state: present
+
+    - name: Start and Enable Firewalld service
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Open SSH port 22 on all nodes
+      firewalld:
+        port: 22/tcp
+        permanent: true
+        state: enabled
+        immediate: yes
+
+    - name: Open Node Exporter port 9100 on all nodes
+      firewalld:
+        port: 9100/tcp
+        permanent: true
+        state: enabled
+        immediate: yes
+
+- name: Setup Firewalld on host for Prometheus, Alertmanager, and Grafana
+  hosts: control
+  become: yes
+  tasks:
+    - name: Open Prometheus port 9090 on host
+      firewalld:
+        port: 9090/tcp
+        permanent: true
+        state: enabled
+        immediate: yes
+
+    - name: Open Alertmanager port 9093 on host
+      firewalld:
+        port: 9093/tcp
+        permanent: true
+        state: enabled
+        immediate: yes
+
+    - name: Open Grafana port 3000 on host
+      firewalld:
+        port: 3000/tcp
+        permanent: true
+        state: enabled
+        immediate: yes
