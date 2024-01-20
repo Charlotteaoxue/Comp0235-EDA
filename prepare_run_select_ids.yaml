@@ -1,0 +1,20 @@
+- name: Set execute permissions and generate empty .fasta files
+  hosts: client,cluster
+  gather_facts: no
+  tasks:
+    - name: Ensure select_ids.py is executable
+      file:
+        path: "/home/ec2-user/data/pdb70/select_ids.py"
+        mode: '0755'
+
+    - name: Find all experiment_ids_*.txt files
+      find:
+        paths: "/home/ec2-user/data/pdb70"
+        patterns: "experiment_ids_*.txt"
+      register: txt_files
+
+    - name: Create empty .fasta files corresponding to each .txt file
+      file:
+        path: "{{ item.path | regex_replace('txt$', 'fasta') }}"
+        state: touch
+      loop: "{{ txt_files.files }}"

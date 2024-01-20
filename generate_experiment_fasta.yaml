@@ -1,0 +1,20 @@
+- name: Get the fast data corresponding to experiment_ids_*.txt by running select_ids.py script
+  hosts: client:cluster
+  gather_facts: no
+  tasks:
+    - name: Find all experiment_ids_*.txt files
+      become: yes
+      find:
+        paths: "/home/ec2-user/data/pdb70/"
+        patterns: "experiment_ids_*.txt"
+      register: txt_files
+
+    - name: Activate virtual environment and run select_ids.py script for each txt file
+      become: yes
+      shell: |
+        source /home/ec2-user/data/myvenv/bin/activate &&
+        python /home/ec2-user/data/pdb70/select_ids.py "{{ item.path }}" "/home/ec2-user/data/pdb70/uniprotkb_proteome_UP000005640_2023_10_05.fasta" "/home/ec2-user/data/pdb70/{{ item.path | basename | replace('.txt', '.fasta') }}"
+      loop: "{{ txt_files.files }}"
+      args:
+        chdir: "/home/ec2-user/data/pdb70"
+        executable: /bin/bash

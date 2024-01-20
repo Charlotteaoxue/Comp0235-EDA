@@ -13,26 +13,14 @@
 - name: Distribute individual experiment_ids files to each cluster
   hosts: cluster
   tasks:
-    - name: Copy experiment_ids_4.txt to cluster 1
+    - name: Copy experiment_ids file to respective cluster
       copy:
-        src: "/home/ec2-user/experiment_ids_4.txt"
+        src: "/home/ec2-user/experiment_ids_{{ cluster_files[inventory_hostname] }}.txt"
         dest: "/home/ec2-user/data/pdb70/"
-      when: inventory_hostname == 'cluster1'
-
-    - name: Copy experiment_ids_5.txt to cluster 2
-      copy:
-        src: "/home/ec2-user/experiment_ids_5.txt"
-        dest: "/home/ec2-user/data/pdb70/"
-      when: inventory_hostname == 'cluster2'
-
-    - name: Copy experiment_ids_6.txt to cluster 3
-      copy:
-        src: "/home/ec2-user/experiment_ids_6.txt"
-        dest: "/home/ec2-user/data/pdb70/"
-      when: inventory_hostname == 'cluster3'
-
-    - name: Copy experiment_ids_7.txt to cluster 4
-      copy:
-        src: "/home/ec2-user/experiment_ids_7.txt"
-        dest: "/home/ec2-user/data/pdb70/"
-      when: inventory_hostname == 'cluster4'
+      vars:
+        cluster_files:
+          cluster1: "4"
+          cluster2: "5"
+          cluster3: "6"
+          cluster4: "7"
+      when: inventory_hostname in cluster_files
