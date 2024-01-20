@@ -1,0 +1,27 @@
+- name: Distribute the set of files needed to run the data pipeline to clients and clusters
+  hosts: client:cluster
+  gather_facts: no
+  vars:
+    source_path: "/home/ec2-user/"
+    target_path: "/home/ec2-user/data/"
+    files_to_transfer:
+      - "pipeline_script.py"
+      - "results_parser.py"
+      - "select_ids.py"
+      - "uniprotkb_proteome_UP000005640_2023_10_05.fasta"
+      - "experiment_ids.txt"
+
+  tasks:
+    - name: Ensure the target directory exists
+      file:
+        path: "{{ target_path }}"
+        state: directory
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['client'] + groups['cluster'] }}"
+
+    - name: Transfer files to target hosts
+      copy:
+        src: "{{ source_path }}{{ item }}"
+        dest: "{{ target_path }}"
+      with_items: "{{ files_to_transfer }}"
+      delegate_to: control
