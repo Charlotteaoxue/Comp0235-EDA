@@ -1,0 +1,25 @@
+- name: Collect basic system information of clients and cluster groups
+  hosts: client:cluster
+  gather_facts: true
+
+  tasks:
+    - name: Display the total memory for each host
+      debug:
+        msg: "Host {{ inventory_hostname }} has {{ ansible_facts['memtotal_mb'] }} MB of total memory."
+
+    - name: Display CPU core count
+      debug:
+        msg: "Host {{ inventory_hostname }} has {{ ansible_facts['processor_cores'] }} CPU cores."
+
+    - name: Display operating system information
+      debug:
+        msg: "Host {{ inventory_hostname }} is running {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
+
+    - name: Check AVX2 support in CPU flags
+      command: grep -o 'avx2' /proc/cpuinfo
+      register: avx2_check
+      ignore_errors: yes
+
+    - name: Display AVX2 support result
+      debug:
+        msg: "Host {{ inventory_hostname }} {{ 'supports' if avx2_check.rc == 0 else 'does not support' }} AVX2."
