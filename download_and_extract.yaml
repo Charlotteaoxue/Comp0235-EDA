@@ -1,0 +1,46 @@
+- name: Download and extract a file in the mounted volume
+  hosts: client:cluster
+  become: true
+  tasks:
+    - name: Create temp directory for downloads
+      ansible.builtin.file:
+        path: /home/ec2-user/data/temp
+        state: directory
+        mode: '0775'
+
+    - name: Download pdb70_from_mmcif_latest.tar.gz
+      ansible.builtin.get_url:
+        url: https://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pdb70_from_mmcif_latest.tar.gz
+        dest: /home/ec2-user/data/pdb70_from_mmcif_latest.tar.gz
+        tmp_dest: /home/ec2-user/data/temp
+        mode: '0644'
+      register: download_monitor
+
+    - name: Create a directory for extraction
+      ansible.builtin.file:
+        path: /home/ec2-user/data/pdb70
+        state: directory
+        mode: '0755'
+
+    - name: Extract pdb70_from_mmcif_latest.tar.gz
+      ansible.builtin.unarchive:
+        src: /home/ec2-user/data/pdb70_from_mmcif_latest.tar.gz
+        dest: /home/ec2-user/data/pdb70
+        remote_src: yes
+      register: extract_monitor
+
+    - name: Change owner of the extracted files
+      ansible.builtin.file:
+        path: /home/ec2-user/data/pdb70
+        state: directory
+        recurse: yes
+        owner: ec2-user
+        group: ec2-user
+      register: chown_monitor
+
+    - name: Display task monitor results
+      ansible.builtin.debug:
+        msg: 
+          - "Download task: {{ download_monitor }}"
+          - "Extract task: {{ extract_monitor }}"
+          - "Chown task: {{ chown_monitor }}"
