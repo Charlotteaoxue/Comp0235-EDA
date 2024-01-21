@@ -1,0 +1,33 @@
+- name: Setup environment and run Python script
+  hosts: control
+  become: yes
+  tasks:
+    - name: Create empty CSV files
+      file:
+        path: "/home/ec2-user/{{ item }}"
+        state: touch
+        owner: ec2-user
+        group: ec2-user
+      loop:
+        - "profile_out.csv"
+        - "hits_output.csv"
+
+    - name: Install pip if not present
+      package:
+        name: python3-pip
+        state: present
+
+    - name: Install Python libraries
+      become: false 
+      pip:
+        name: "{{ item }}"
+        state: present
+        extra_args: --user
+      loop:
+        - pandas
+        - pyarrow
+
+    - name: Run Python script
+      command: "python3 /home/ec2-user/processing_fasta_data.py"
+      become: false
+      become_user: ec2-user

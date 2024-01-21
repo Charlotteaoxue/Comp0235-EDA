@@ -1,0 +1,23 @@
+- name: Fetch experiment CSV files from client and cluster nodes
+  hosts: client,cluster
+  gather_facts: no
+  tasks:
+    - name: Find experiment CSV files on node
+      find:
+        paths: "/home/ec2-user/data/pdb70/"
+        patterns: 'experiment_*.csv'
+        recurse: yes
+      register: csv_files
+
+    - name: Print found CSV files
+      debug:
+        msg: "{{ csv_files.files }}"
+      when: csv_files.files | length > 0
+
+    - name: Fetch found experiment CSV files from node
+      fetch:
+        src: "{{ item.path }}"
+        dest: "/home/ec2-user/{{ item.path | basename }}"
+        flat: yes
+      loop: "{{ csv_files.files }}"
+      when: csv_files.files | length > 0
