@@ -1,7 +1,8 @@
 - hosts: control
   tasks:
     - name: Split experiment_ids.txt into chunks of 858 lines each
-      ansible.builtin.shell: split -l 858 -d --additional-suffix=.txt experiment_ids.txt experiment_ids_
+      # ansible.builtin.shell: split -l 858 -d --additional-suffix=.txt experiment_ids.txt experiment_ids_
+      ansible.builtin.shell: split -l 1000 -d --additional-suffix=.txt experiment_ids.txt experiment_ids_
       args:
         chdir: /home/ec2-user/
       register: split_result

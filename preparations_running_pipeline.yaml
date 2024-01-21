@@ -1,0 +1,43 @@
+- hosts: client
+  tasks:
+    - name: Create directories 1 and 2 in /home/ec2-user/data/pdb70
+      ansible.builtin.file:
+        path: "/home/ec2-user/data/pdb70/{{ item }}"
+        state: directory
+      loop: ["1", "2"]
+
+    - name: Move experiment_ids files to respective directories in /home/ec2-user/data/pdb70
+      ansible.builtin.shell:
+        cmd: "mv /home/ec2-user/data/pdb70/experiment_ids_{{ item[0] }}.fasta /home/ec2-user/data/pdb70/experiment_ids_{{ item[0] }}.txt /home/ec2-user/data/pdb70/{{ item[1] }}/"
+      loop: 
+        - ["1", "1"]
+        - ["2", "2"]
+      ignore_errors: yes
+
+    - name: Copy scripts to directories in /home/ec2-user/data/pdb70
+      ansible.builtin.shell:
+        cmd: "cp /home/ec2-user/data/pdb70/pipeline_script.py /home/ec2-user/data/pdb70/results_parser.py /home/ec2-user/data/pdb70/{{ item }}/"
+      loop: ["1", "2"]
+
+    - name: Create experiment_ids_1.csv in directory 1
+      ansible.builtin.file:
+        path: "/home/ec2-user/data/pdb70/1/experiment_ids_1.csv"
+        state: touch
+
+    - name: Create experiment_ids_2.csv in directory 2
+      ansible.builtin.file:
+        path: "/home/ec2-user/data/pdb70/2/experiment_ids_2.csv"
+        state: touch
+
+- hosts: cluster
+  tasks:
+    - name: Create specific experiment_ids CSV file for each cluster host
+      ansible.builtin.file:
+        path: "/home/ec2-user/data/pdb70/experiment_ids_{{ item.id }}.csv"
+        state: touch
+      loop:
+        - { host: 'cluster1', id: '3' }
+        - { host: 'cluster2', id: '4' }
+        - { host: 'cluster3', id: '5' }
+        - { host: 'cluster4', id: '6' }
+      when: inventory_hostname == item.host
