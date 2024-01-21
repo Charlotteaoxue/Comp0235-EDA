@@ -1,0 +1,29 @@
+groups:
+- name: resource_usage_alerts
+  rules:
+  - alert: HighCpuUsage
+    expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage detected on {{ $labels.instance }}"
+      description: "CPU usage is above 80% (currently {{ $value }}%) on {{ $labels.instance }}."
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 80
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage detected on {{ $labels.instance }}"
+      description: "Memory usage is above 80% (currently {{ $value }}%) on {{ $labels.instance }}."
+
+  - alert: HighDiskUsage
+    expr: (node_filesystem_size_bytes{fstype!="tmpfs",mountpoint!="/boot"} - node_filesystem_free_bytes{fstype!="tmpfs",mountpoint!="/boot"}) / node_filesystem_size_bytes{fstype!="tmpfs",mountpoint!="/boot"} * 100 > 80
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High disk usage detected on {{ $labels.instance }}"
+      description: "Disk usage is above 80% (currently {{ $value }}%) on {{ $labels.instance }}."
