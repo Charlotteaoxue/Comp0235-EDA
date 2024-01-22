@@ -5,7 +5,7 @@
     - name: Find experiment CSV files on node
       find:
         paths: "/home/ec2-user/data/pdb70/"
-        patterns: 'experiment_*.csv'
+        patterns: 'experiment_ids_*.csv'
         recurse: yes
       register: csv_files
 
