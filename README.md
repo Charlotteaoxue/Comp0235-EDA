@@ -193,6 +193,7 @@ ansible-playbook -i your_inventory_file split_distribute_generate_fasta.yaml
 
 ```bash
 ansible-playbook -i your_inventory_file get_all_experiment_fasta.yaml
+ansible-playbook -i your_inventory_file consolidate_all_fasta_files.yaml
 ansible-playbook -i your_inventory_file process_data_get_final_results.yaml
 ```
 

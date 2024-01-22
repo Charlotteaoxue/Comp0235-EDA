@@ -1,0 +1,20 @@
+- name: Combine CSV files and prepend header
+  hosts: control
+  gather_facts: no
+  tasks:
+    - name: Create all_fasta.csv and add header
+      copy:
+        dest: "/home/ec2-user/all_fasta.csv"
+        content: "query_id,best_hit,best_evalue,best_score,score_mean,score_std,score_gmean\n"
+        mode: '0644'
+
+    - name: Find all experiment CSV files
+      find:
+        paths: "/home/ec2-user/"
+        patterns: 'experiment_ids_*.csv'
+      register: csv_files
+
+    - name: Concatenate content of each CSV file from the second line
+      shell: "tail -n +2 {{ item.path }} >> /home/ec2-user/all_fasta.csv"
+      loop: "{{ csv_files.files }}"
+      when: csv_files.matched > 0
