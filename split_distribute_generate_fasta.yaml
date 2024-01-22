@@ -1,3 +1,4 @@
 - import_playbook: split_experiment_ids.yaml
 - import_playbook: distribute_experiment_ids_files.yaml
+- import_playbook: prepare_run_select_ids.yaml
 - import_playbook: generate_experiment_fasta.yaml
