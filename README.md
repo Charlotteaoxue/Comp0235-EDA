@@ -225,12 +225,10 @@ rule_files:
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseri
-es scraped from this config.
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'prometheus'
 
-    # Override the global default and scrape targets from this job ev
-ery 5 seconds.
+    # Override the global default and scrape targets from this job every 5 seconds.
     scrape_interval: 5s
     scrape_timeout: 5s
 
